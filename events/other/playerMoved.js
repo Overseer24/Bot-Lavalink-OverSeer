@@ -18,7 +18,6 @@ module.exports = {
                     .setTitle("Player Disconnected")
                     .setDescription("Bat mo naman yon ginawa?")
                     .setColor('Random')
-                    .setFooter({ text: "Powered by DesQ Pogi" });
 
                 player.pause(true)
                 player.disconnect();

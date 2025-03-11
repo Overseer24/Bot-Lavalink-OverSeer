@@ -6,7 +6,7 @@ function loadCommands(client) {
     const commandFiles = fs.readdirSync("./commands");
     for (const fileOrFolder of commandFiles) {
         const fullPath = path.join(commandsPath, fileOrFolder);
-       
+
         if (fs.statSync(fullPath).isDirectory()) {
             const subFiles = fs.readdirSync(fullPath).filter(file => file.endsWith(".js"));
 
@@ -37,13 +37,60 @@ function loadEvents(client) {
     fs.readdirSync(eventsPath).forEach((file) => {
         if (file.endsWith(".js")) {
             const event = require(path.join(eventsPath, file));
-            console.log(`Event ${file} loaded`);
+            // console.log(`Event ${file} loaded`);
             client.on(event.name, (...args) => event.execute(...args));
         }
     });
 }
 
-module.exports = { loadCommands, loadEvents };
+function loadButtons(client) {
+    const buttonsPath = path.join(__dirname, "../buttons");
+    if (!fs.existsSync(buttonsPath)) {
+        console.log("Buttons folder does not exist.");
+        return;
+    }
+
+    const buttonFiles = fs.readdirSync(buttonsPath).filter(file => file.endsWith(".js"));
+
+    for (const file of buttonFiles) {
+        const button = require(path.join(buttonsPath, file));
+
+        if ('customId' in button && 'execute' in button) {
+            client.buttons.set(button.customId, button);
+        } else {
+            console.log(`Button ${file} is missing 'customId' or 'execute'`);
+        }
+    }
+    // const buttonsPath = path.join(__dirname, "../buttons");
+    // const buttonFiles = fs.readdirSync("./buttons");
+    // for (const fileOrFolder of buttonFiles) {
+    //     const fullPath = path.join(buttonsPath, fileOrFolder);
+
+    //     if (fs.statSync(fullPath).isDirectory()) {
+    //         const subFiles = fs.readdirSync(fullPath).filter(file => file.endsWith(".js"));
+
+    //         for (const file of subFiles) {
+    //             const filePath = path.join(fullPath, file);
+    //             const button = require(filePath);
+    //             if ('customId' in button && 'execute' in button) {
+    //                 client.buttons.set(button.customId, button);
+    //             } else {
+
+    //             }
+    //         }
+    //     }
+    //     else if (fileOrFolder.endsWith(".js")) {
+    //         const button = require(fullPath);
+    //         if ('customId' in button && 'execute' in button) {
+    //             client.buttons.set(button.customId, button);
+    //         } else {
+
+    //         }
+    //     }
+    // }
+}
+
+module.exports = { loadCommands, loadEvents, loadButtons };
 
 
 // const fs = require('fs');

@@ -1,7 +1,8 @@
-const { EmbedBuilder } = require("discord.js")
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
+const { ButtonStyle } = require("discord.js");
 const path = require("path");
-const {formatDuration} = require( "../../utils/durationFormatter.js");
-const format =path.join(__dirname, "../../utils/durationFormatter")
+const { formatDuration } = require("../../utils/durationFormatter.js");
+
 
 
 module.exports = {
@@ -10,19 +11,40 @@ module.exports = {
         try {
             const textChannel = client.channels.cache.get(player.textId);
             if (!textChannel) return;
-            // console.log("Track:", track);
-            // console.log("Player:", player);
-            // console.log("Player Start:", player.queue.current);
+         
             const requester = player.queue.current.requester
                 ? `<@${player.queue.current.requester.id}>`
                 : "Unknown";
 
+
             const embed = new EmbedBuilder()
                 .setTitle("🎶Now Playing")
                 // .setDescription(` [${track.title}](${track.uri})`)
-                .setDescription(`**[${track.title}](${track.uri})** - \`${formatDuration(track.length)}\`\n\n👤 **Requested by:** ${requester}`)
+                .setDescription(`**[${track.title || "Unknown"}](${track.uri})** - \`${track.author}\` `)
+                .addFields(
+                    { name: "**Duration:**", value: `${formatDuration(track.length)}`, inline: true },
+                    { name: "**Requested by:**", value: `${requester}`, inline: true }
+                )
+                // .addField({})
                 .setColor('Random')
-              
+
+            const skip = new ButtonBuilder()
+                .setCustomId("skip")
+                .setLabel("Skip")
+                .setStyle(1)
+
+            const pause = new ButtonBuilder()
+                .setCustomId("pause")
+                .setLabel("Pause")
+                .setStyle(1)
+
+            const resume = new ButtonBuilder()
+                .setCustomId("resume")
+                .setLabel("Resume")
+                .setStyle(1)
+
+            const row = new ActionRowBuilder()
+                .addComponents(skip, pause, resume);
 
             if (track.thumbnail) {
                 embed.setThumbnail(track.thumbnail);
@@ -31,7 +53,10 @@ module.exports = {
                 embed.setThumbnail(client.user.displayAvatarURL());
             }
 
-            await textChannel.send({ embeds: [embed] });
+            await textChannel.send({
+                embeds: [embed],
+                components: [row]
+            });
 
 
         } catch (error) {

@@ -12,38 +12,52 @@ module.exports = {
         ),
 
     async execute(interaction, client) {
-        
+
         try {
             await interaction.deferReply();
             const embed = new EmbedBuilder();
 
             const query = interaction.options.getString("query");
             const { channel } = interaction.member.voice;
-            if (!channel) {
-                embed
-                    .setTitle("Error")
-                    .setDescription("❌ You must be in a voice channel to use this command!")
-                    .setColor('Red')
-                return interaction.editReply({ embeds: [embed] });
-
+            const memberVoiceChannel = interaction.member.voice.channel;
+            if (!memberVoiceChannel) {
+                embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor('Red');
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
 
-            if (!channel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SPEAK)) {
-                embed
-                    .setTitle("Error")
-                    .setDescription("❌ I don't have permission to connect to the voice channel!")
-                    .setColor('Red')
-                return interaction.editReply({ embeds: [embed] });
-                // return interaction.reply({ content: "❌ I don't have permission to connect to the voice channel!", ephemeral: true });
+            if (!memberVoiceChannel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SPEAK)) {
+                embed.setTitle("Error").setDescription("❌ I don't have permission to speak in this channel!").setColor('Red');
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
+
+
 
             let player = client.manager.players.get(interaction.guild.id);
+
+            if (player) {
+                const botMember = await interaction.guild.members.fetchMe();
+                const botVoiceChannel = botMember.voice.channel;
+                if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
+                    embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
+                    return interaction.editReply({ embeds: [embed], ephemeral: true });
+                }
+
+                if (!botVoiceChannel) {
+                  
+                    player.setVoiceChannel(memberVoiceChannel.id);
+                    player.pause(false);
+                }
+
+            }
+
+
+
             if (!player) {
                 player = await client.manager.createPlayer({
                     guildId: interaction.guild.id,
                     voiceId: channel.id,
                     textId: interaction.channel.id,
-                    volume: 50,
+                    volume: 1,
                     deaf: true,
                 });
 
@@ -57,7 +71,7 @@ module.exports = {
                     .setTitle("Error")
                     .setDescription("❌ No results found!")
                     .setColor('Red')
-                return interaction.editReply({ embeds: [embed] });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
 
             if (res.type === "PLAYLIST") {
@@ -80,6 +94,7 @@ module.exports = {
                 player.queue.add(res.tracks[0]);
                 if (!player.playing && !player.paused) {
                     player.play();
+                    // console.log(player.queue.current)
                 }
 
                 embed
@@ -91,47 +106,9 @@ module.exports = {
             }
         } catch (error) {
             console.error(error);
-            return interaction.editReply({ content: "❌ There was an error while processing your request!" });
+            return interaction.editReply({ content: "❌ There was an error while processing your request!", ephemeral: true });
 
         }
 
-
-
-
-        // if (!interaction.member.voice.channelId) {
-        //     return interaction.reply({ content: "❌ You must be in a voice channel!", ephemeral: true });
-        // }
-
-        // if (!interaction.client.kazagumo) {
-        //     return interaction.reply({ content: "❌ Lavalink is not initialized!", ephemeral: true });
-        // }
-
-        // // Get the Kazagumo player for the guild
-        // let player = interaction.client.kazagumo.players.get(interaction.guild.id);
-
-        // // If there's no player, create and connect one
-        // if (!player) {
-        //     player = await interaction.client.kazagumo.createPlayer({
-        //         guildId: interaction.guild.id,
-        //         voiceId: interaction.member.voice.channelId,
-        //         textId: interaction.channel.id,
-        //         volume: 50, // Default volume
-        //     });
-        // }
-
-        // // Search for the song
-        // const result = await interaction.client.kazagumo.search(query, { requester: interaction.user });
-
-        // if (!result.tracks.length) {
-        //     return interaction.reply({ content: "❌ No results found!", ephemeral: true });
-        // }
-
-        // // Add song to queue
-        // player.queue.add(result.tracks[0]);
-
-        // // Start playing if not already playing
-        // if (!player.playing) player.play();
-
-        // return interaction.reply({ content: `🎶 Now playing: **${result.tracks[0].title}**` });
     }
 };

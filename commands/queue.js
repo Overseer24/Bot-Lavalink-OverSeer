@@ -18,24 +18,28 @@ module.exports = {
                 .setColor('Red')
             return interaction.reply({ embeds: [embed] });
         }
+        //make this a reusable function in the future
+        // const memberVoiceChannel = interaction.member.voice.channel;
+        // if (!memberVoiceChannel) {
+        //     embed
+        //         .setTitle("Error")
+        //         .setDescription("❌ You must be in a voice channel to use this command!")
+        //         .setColor("Red");
+        //     return interaction.reply({ embeds: [embed], ephemeral: true });
+        // }
 
-        const { channel } = interaction.member.voice;
+        // const botVoiceChannel = client.channels.cache.get(player.voiceId);
+    
 
-        const botVoiceChannel = client.manager.players.get(interaction.guild.id)?.voiceId; // Lavalink bot voice channel
-        const memberVoiceChannel = interaction.member.voice.channel?.id; // User's voice channel
-
-        if (!channel || memberVoiceChannel !== botVoiceChannel) {
-            embed
-                .setTitle("Error")
-                .setDescription("❌ You must be in the same voice channel as me to use this command!")
-                .setColor('Red')
-            return interaction.reply({ embeds: [embed] });
-        }
+        // if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
+        //     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
+        //     return interaction.reply({ embeds: [embed], ephemeral: true });
+        // }
 
         try {
             const queue = player.queue;
             const current = queue.current;
-            
+
             if (queue.length === 0 && !current) {
                 embed
                     .setTitle("Queue")

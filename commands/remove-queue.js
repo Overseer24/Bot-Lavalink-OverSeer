@@ -11,7 +11,7 @@ module.exports = {
         ),
 
     async execute(interaction, client) {
-        const {options} = interaction;
+        const { options } = interaction;
         const embed = new EmbedBuilder();
         const player = client.manager.players.get(interaction.guild.id);
 
@@ -20,20 +20,23 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ Nothing is playing right now")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        const { channel } = interaction.member.voice;
-
-        const botVoiceChannel = client.manager.players.get(interaction.guild.id)?.voiceId; // Lavalink bot voice channel
-        const memberVoiceChannel = interaction.member.voice.channel?.id; // User's voice channel
-
-        if (!channel || memberVoiceChannel !== botVoiceChannel) {
+        const memberVoiceChannel = interaction.member.voice.channel;
+        if (!memberVoiceChannel) {
             embed
                 .setTitle("Error")
-                .setDescription("❌ You must be in the same voice channel as me to use this command!")
-                .setColor('Red')
-            return interaction.reply({ embeds: [embed] });
+                .setDescription("❌ You must be in a voice channel to use this command!")
+                .setColor("Red");
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+        const botMember = await interaction.guild.members.fetchMe();
+        const botVoiceChannel = botMember.voice.channel;
+
+        if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
+            embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const index = options.getInteger("index") - 1;
@@ -42,11 +45,11 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ Invalid song index")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const removed = player.queue.splice(index, 1);
-      
+
         embed
             .setTitle("Success")
             .setDescription(`✅ Removed [${removed[0].title}](${removed[0].uri}) from the queue`)

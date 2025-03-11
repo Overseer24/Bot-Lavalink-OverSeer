@@ -11,35 +11,23 @@
 // };
 
 const { EmbedBuilder } = require("discord.js")
-
+const e = require("express")
+//when queue is becomes empty
 module.exports = {
     name: 'playerEmpty',
     async execute(client, player) {
-        console.log("Queue ended")
-        // if (!player || !player.textId) {
-        //     console.log("Player not found")
-        //     return;
-        // }
+        const embed = new EmbedBuilder()
+        const textChannel = client.channels.cache.get(player.textId);
 
-        // const channel = client.channels.cache.get(player.textId);
-        // if (!channel) {
-        //     console.log("Channel not found")
-        //     return;
-        // }
+        if (!textChannel) return;
 
-        // if (player.data.get("stay")) return;
+        if (player.data.get("stay")) return;
+        embed
+            .setTitle("Queue Ended")
+            .setDescription("🛑 There are no more songs in the queue")
+            .setColor('Random')
+        await textChannel.send({ embeds: [embed] })
 
-        // const embed = new EmbedBuilder()
-        //     .setColor('Random')
-        //     .setTimestamp("Ended")
-        //     .setDescription("The queue has ended and is empty.")
-        //     .setFooter({ text: "Thanks for listening!" });
-
-        // await channel.send({ embeds: [embed] });
-        // player.destroy();
-    }   
-    
-        
-
-
+        player.destroy();
+    }
 }

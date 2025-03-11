@@ -16,7 +16,7 @@ const commands = [];
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs.readdirSync("./commands")
 
-console.log(`Found ${commandFiles.length} command files`);
+
 
 for (const fileOrFolder of commandFiles) {
     const fullPath = path.join(commandsPath, fileOrFolder);

@@ -26,23 +26,21 @@ module.exports = {
             return interaction.reply({ embeds: [embed] });
         }
 
-//make this a reusable function in the future
+        //make this a reusable function in the future
         const memberVoiceChannel = interaction.member.voice.channel;
         if (!memberVoiceChannel) {
             embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor("Red");
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
-        // Re-fetch the bot's current voice channel
         const botMember = await interaction.guild.members.fetchMe();
         const botVoiceChannel = botMember.voice.channel;
-
         if (!botVoiceChannel || botVoiceChannel.id !== memberVoiceChannel.id) {
             embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
         // if the player is already paused, return an error
         if (player.paused) {
-            embed
+            embed   
                 .setTitle("Error")
                 .setDescription("❌ The player is already paused")
                 .setColor('Red')

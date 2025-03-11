@@ -29,7 +29,6 @@ module.exports = {
         //make this a reusable function in the future
         // await interaction.guild.members.fetch(interaction.member.id);
         const memberVoiceChannel = interaction.member.voice.channel;
-        console.log(`Member Voice Channel: ${memberVoiceChannel?.id}`);
         if (!memberVoiceChannel) {
             embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor("Red");
             return interaction.reply({ embeds: [embed], ephemeral: true });
@@ -42,7 +41,7 @@ module.exports = {
         }
 
 
-        console.log(memberVoiceChannel?.id);
+    
         if (player.paused) {
             embed
                 .setTitle("Error")

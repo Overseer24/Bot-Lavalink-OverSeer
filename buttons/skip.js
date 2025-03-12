@@ -15,15 +15,15 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ Nothing is playing right now")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed]}, { ephemeral: true });
+            return interaction.reply({ embeds: [embed] }, { ephemeral: true });
         }
 
-        if(!player.queue.current) {
+        if (!player.queue.current) {
             embed
                 .setTitle("Error")
                 .setDescription("❌ There is no song currently playing")
                 .setColor('Red')
-                return interaction.reply({ embeds: [embed]}, { ephemeral: true });
+            return interaction.reply({ embeds: [embed] }, { ephemeral: true });
         }
 
         const memberVoiceChannel = interaction.member.voice.channel;
@@ -42,8 +42,17 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
         // If the bot is disconnected but still has a queue, reconnect it
+        // console.log(player.queue.length);
+        // if (!botVoiceChannel && player.queue.length > 1) {
+        //     player.setVoiceChannel(memberVoiceChannel.id);
+        // }
+
         if (!botVoiceChannel) {
-            player.setVoiceChannel(memberVoiceChannel.id);
+            embed
+                .setTitle("Error")
+                .setDescription("❌ I am not connected to a voice channel")
+                .setColor('Red')
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         try {
@@ -60,7 +69,7 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ There was an error skipping the song")
                 .setColor('Red')
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };

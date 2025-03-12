@@ -16,13 +16,11 @@ const e = require("express")
 module.exports = {
     name: 'playerEmpty',
     async execute(client, player) {
-        console.log("Queue Empty")
         const embed = new EmbedBuilder()
         const textChannel = client.channels.cache.get(player.textId);
         if (!textChannel) return;
 
         const messageId = client.nowPlayingMessages.get(player.guildId);
-        console.log(messageId)
         if (messageId) {
             try {
                 const nowPlayingMessage = await textChannel.messages.fetch(messageId);

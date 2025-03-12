@@ -16,8 +16,15 @@ module.exports = {
             return interaction.reply({ embeds: [embed] });
         }
 
-        const memberVoiceChannel = interaction.member.voice.channel;
+        if (!player.queue.current) {
+            embed
+                .setTitle("Error")
+                .setDescription("❌ There is no song currently playing")
+                .setColor('Red')
+            return interaction.reply({ embeds: [embed] }, { ephemeral: true });
+        }
 
+        const memberVoiceChannel = interaction.member.voice.channel;
         if (!memberVoiceChannel) {
             embed
                 .setTitle("Error")
@@ -25,17 +32,27 @@ module.exports = {
                 .setColor("Red");
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
-
         const botMember = await interaction.guild.members.fetchMe();
         const botVoiceChannel = botMember.voice.channel;
+
         if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
             embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
-        if (!botVoiceChannel) {
-            player.setVoiceChannel(memberVoiceChannel.id);
+        // If the bot is disconnected but still has a queue, reconnect it
 
+        // if (!botVoiceChannel && player.queue.length > 0) {
+        //     player.setVoiceChannel(memberVoiceChannel.id);
+        // }
+        if (!botVoiceChannel) {
+            embed
+                .setTitle("Error")
+                .setDescription("❌ I am not connected to a voice channel")
+                .setColor('Red')
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
+
+
         try {
             await player.skip();
             embed

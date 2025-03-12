@@ -28,11 +28,13 @@ module.exports = {
 
         const botMember = await interaction.guild.members.fetchMe();
         const botVoiceChannel = botMember.voice.channel;
-
-
+        if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
+            embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
         if (!botVoiceChannel) {
             player.setVoiceChannel(memberVoiceChannel.id);
-           
+
         }
         try {
             await player.skip();

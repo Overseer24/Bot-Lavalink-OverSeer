@@ -6,7 +6,7 @@ module.exports = {
     async execute(player, state, channels, client) {
 
         try {
-          
+
             const textChannel = client.channels.cache.get(player.textId);
             const embed = new EmbedBuilder()
             if (!textChannel) return;
@@ -21,6 +21,16 @@ module.exports = {
 
                 player.pause(true)
                 player.disconnect();
+                const messageId = client.nowPlayingMessages.get(player.guildId);
+                if (messageId) {
+                    try {
+                        const nowPlayingMessage = await textChannel.messages.fetch(messageId);
+                        await nowPlayingMessage.delete();
+                        client.nowPlayingMessages.delete(player.guildId);
+                    } catch (error) {
+                        console.error("Failed to delete Now Playing message:", error);
+                    }
+                }
 
                 await textChannel.send({ embeds: [embed] });
             }
@@ -30,7 +40,7 @@ module.exports = {
                     .setTitle("Moved to new channel")
                     .setDescription(`Moved to <#${channels.newChannelId}>`)
                     .setColor('Random')
-                 
+
 
                 // player.voiceId = channels.newChannelId;
                 await textChannel.send({ embeds: [embed] });

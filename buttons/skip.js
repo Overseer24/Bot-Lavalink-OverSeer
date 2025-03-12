@@ -7,8 +7,8 @@ module.exports = {
 
         const embed = new EmbedBuilder();
 
-        console.log("Player exists:", !!player);
-        console.log("Current song exists:", !!player?.queue?.current);
+        // console.log("Player exists:", !!player);
+        // console.log("Current song exists:", !!player?.queue?.current);
 
         if (!player) {
             embed

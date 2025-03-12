@@ -11,7 +11,7 @@ module.exports = {
         try {
             const textChannel = client.channels.cache.get(player.textId);
             if (!textChannel) return;
-         
+
             const requester = player.queue.current.requester
                 ? `<@${player.queue.current.requester.id}>`
                 : "Unknown";
@@ -53,12 +53,15 @@ module.exports = {
                 embed.setThumbnail(client.user.displayAvatarURL());
             }
 
-            await textChannel.send({
+
+            // Send the embed message and store it in a variable to track it
+            const nowPlayingMessageNew = await textChannel.send({
                 embeds: [embed],
                 components: [row]
             });
 
-
+            // Store the new message reference for future use
+            client.nowPlayingMessages.set(player.guildId, nowPlayingMessageNew.id);
         } catch (error) {
             console.error(error);
         }

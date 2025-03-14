@@ -1,17 +1,8 @@
-// module.exports = {
-//     name: 'playerEmpty',
-//     async execute(client, player) {
-//         if(player.data.get("autoplay")){
-//             const requester = player.date.get("requester")
-//             const identifier = player.data.get("identifier")
-//             const search = 
-//         }
-//     }
 
-// };
 
 const { EmbedBuilder } = require("discord.js")
 const e = require("express")
+const { clearNowPlayingMessage } = require("../../utils/clearNowPlayingMessage");
 //when queue is becomes empty
 module.exports = {
     name: 'playerEmpty',
@@ -20,17 +11,17 @@ module.exports = {
         const textChannel = client.channels.cache.get(player.textId);
         if (!textChannel) return;
 
-        const messageId = client.nowPlayingMessages.get(player.guildId);
-        if (messageId) {
-            try {
-                const nowPlayingMessage = await textChannel.messages.fetch(messageId);
-                await nowPlayingMessage.delete();
-                client.nowPlayingMessages.delete(player.guildId);
-            } catch (error) {
-                console.error("Failed to delete Now Playing message:", error);
-            }
-        }
-
+        // const messageId = client.nowPlayingMessages.get(player.guildId);
+        // if (messageId) {
+        //     try {
+        //         const nowPlayingMessage = await textChannel.messages.fetch(messageId);
+        //         await nowPlayingMessage.delete();
+        //         client.nowPlayingMessages.delete(player.guildId);
+        //     } catch (error) {
+        //         console.error("Failed to delete Now Playing message:", error);
+        //     }
+        // }
+        await clearNowPlayingMessage(client, player.guildId, player);
         if (player.data.get("stay")) return;
         embed
             .setTitle("Queue Ended")

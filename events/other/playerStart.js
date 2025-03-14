@@ -1,8 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
-const { ButtonStyle } = require("discord.js");
 const path = require("path");
 const { formatDuration } = require("../../utils/durationFormatter.js");
-
+const { buttons } = require("../../utils/buttonsComponents.js")
 
 
 module.exports = {
@@ -16,35 +15,40 @@ module.exports = {
                 ? `<@${player.queue.current.requester.id}>`
                 : "Unknown";
 
-
             const embed = new EmbedBuilder()
                 .setTitle("🎶Now Playing")
                 // .setDescription(` [${track.title}](${track.uri})`)
                 .setDescription(`**[${track.title || "Unknown"}](${track.uri})** - \`${track.author}\` `)
                 .addFields(
                     { name: "**Duration:**", value: `${formatDuration(track.length)}`, inline: true },
-                    { name: "**Requested by:**", value: `${requester}`, inline: true }
+                    { name: "**Requested by:**", value: `${requester}`, inline: true },
+                    { name: "**Volume:**", value: `${player.volume}%`, inline: true },
+                    { name: "**Next Song:**", value: `${player.queue.length > 0 ? `[${player.queue[0].title}](${player.queue[0].uri})` : "No songs in queue"}`, inline: true },
+
                 )
                 // .addField({})
                 .setColor('Random')
 
-            const skip = new ButtonBuilder()
-                .setCustomId("skip")
-                .setLabel("Skip")
-                .setStyle(1)
+            // const skip = new ButtonBuilder()
+            //     .setCustomId("skip")
+            //     .setLabel("Skip")
+            //     .setStyle(1)
 
-            const pause = new ButtonBuilder()
-                .setCustomId("pause")
-                .setLabel("Pause")
-                .setStyle(1)
+            // const pause = new ButtonBuilder()
+            //     .setCustomId("pause")
+            //     .setLabel("Pause")
+            //     .setStyle(1)
 
-            const resume = new ButtonBuilder()
-                .setCustomId("resume")
-                .setLabel("Resume")
-                .setStyle(1)
+            // const resume = new ButtonBuilder()
+            //     .setCustomId("resume")
+            //     .setLabel("Resume")
+            //     .setStyle(1)
 
-            const row = new ActionRowBuilder()
-                .addComponents(skip, pause, resume);
+
+            // const row = new ActionRowBuilder()
+            //     .addComponents(skip, pause, resume);
+
+            const row = buttons();
 
             if (track.thumbnail) {
                 embed.setThumbnail(track.thumbnail);

@@ -25,7 +25,7 @@ module.exports = {
         //         .setTitle("Error")
         //         .setDescription("❌ You must be in a voice channel to use this command!")
         //         .setColor("Red");
-        //     return interaction.reply({ embeds: [embed], ephemeral: true });
+        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         // }
 
         // const botVoiceChannel = client.channels.cache.get(player.voiceId);
@@ -33,7 +33,7 @@ module.exports = {
 
         // if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
         //     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-        //     return interaction.reply({ embeds: [embed], ephemeral: true });
+        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         // }
 
         try {

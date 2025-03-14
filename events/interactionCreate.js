@@ -1,3 +1,5 @@
+const { MessageFlags } = require("discord.js");
+
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction) {
@@ -10,7 +12,7 @@ module.exports = {
 
             } catch (error) {
                 console.error(error);
-                await interaction.reply({ content: '❌ There was an error executing this command.', ephemeral: true });
+                await interaction.reply({ content: '❌ There was an error executing this command.',  });
             }
         }
         else if (interaction.isButton()) {
@@ -22,7 +24,7 @@ module.exports = {
 
             } catch (error) {
                 console.error(error);
-                await interaction.reply({ content: '❌ There was an error executing this button.', ephemeral: true });
+                await interaction.reply({ content: '❌ There was an error executing this button.', flags: MessageFlags.Ephemeral });
             }
 
 

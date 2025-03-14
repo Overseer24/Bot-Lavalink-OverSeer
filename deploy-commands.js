@@ -53,7 +53,6 @@ for (const fileOrFolder of commandFiles) {
             Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DESQ_SERVER_ID),
             { body: commands },
         );
-
         console.log('Successfully reloaded application (/) commands.');
     } catch (error) {
         console.error('Failed to reload application (/) commands:', error);

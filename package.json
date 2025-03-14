@@ -20,11 +20,12 @@
   "dependencies": {
     "@discordjs/rest": "^2.4.3",
     "@discordjs/voice": "^0.18.0",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "fs": "^0.0.1-security",
+    "genius-lyrics": "^4.4.7",
     "kazagumo": "^3.2.2",
     "lavacord": "^2.1.4-v4",
     "lavalink.js": "^0.1.1",

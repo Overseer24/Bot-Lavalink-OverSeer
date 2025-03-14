@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags} = require("discord.js");
+const { checkVoiceChannel } = require("../utils/voiceChannelUtils");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ Nothing is playing right now")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
 
         if (!player.queue.current) {
@@ -24,31 +24,32 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ There is no song currently playing")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
         //make this a reusable function in the future
         // await interaction.guild.members.fetch(interaction.member.id);
-        const memberVoiceChannel = interaction.member.voice.channel;
-        if (!memberVoiceChannel) {
-            embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor("Red");
-            return interaction.reply({ embeds: [embed], ephemeral: true });
-        }
-        const botMember = await interaction.guild.members.fetchMe();
-        const botVoiceChannel = botMember.voice.channel;
-        if (!botVoiceChannel || botVoiceChannel.id !== memberVoiceChannel.id) {
-            embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-            return interaction.reply({ embeds: [embed], ephemeral: true });
-        }
+        // const memberVoiceChannel = interaction.member.voice.channel;
+        // if (!memberVoiceChannel) {
+        //     embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor("Red");
+        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        // }
+        // const botMember = await interaction.guild.members.fetchMe();
+        // const botVoiceChannel = botMember.voice.channel;
+        // if (!botVoiceChannel || botVoiceChannel.id !== memberVoiceChannel.id) {
+        //     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
+        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        // }
+        await checkVoiceChannel(interaction, player, false);
 
 
-    
         if (player.paused) {
             embed
                 .setTitle("Error")
                 .setDescription("❌ The player is already paused")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
+
 
         try {
             await player.pause(true);
@@ -63,7 +64,7 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ There was an error pausing the song")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
     }
 

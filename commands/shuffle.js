@@ -1,21 +1,23 @@
-const { EmbedBuilder, MessageFlags } = require("discord.js");
-const {checkVoiceChannel} = require("../utils/voiceChannelUtils");
+const { EmbedBuilder, SlashCommandBuilder, MessageFlags } = require("discord.js")
+const path = require("path");
+const { clearNowPlayingMessage } = require("../utils/clearNowPlayingMessage");
+const { checkVoiceChannel } = require("../utils/voiceChannelUtils");
+
 module.exports = {
-    customId: "pause",
+    data: new SlashCommandBuilder()
+        .setName("shuffle")
+        .setDescription("Shuffles the queue"),
+
     async execute(interaction, client) {
+        const { channel } = interaction.member.voice;
         const player = client.manager.players.get(interaction.guild.id);
-
         const embed = new EmbedBuilder();
-
-        // console.log("Player exists:", !!player);
-        // console.log("Current song exists:", !!player?.queue?.current);
-
         if (!player) {
             embed
                 .setTitle("Error")
                 .setDescription("❌ Nothing is playing right now")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
 
         if (!player.queue.current) {
@@ -23,10 +25,10 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ There is no song currently playing")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
-
         //make this a reusable function in the future
+        // await interaction.guild.members.fetch(interaction.member.id);
         // const memberVoiceChannel = interaction.member.voice.channel;
         // if (!memberVoiceChannel) {
         //     embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor("Red");
@@ -38,35 +40,31 @@ module.exports = {
         //     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
         //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         // }
-        checkVoiceChannel(interaction, player, false);
+        await checkVoiceChannel(interaction, player, false);
 
-        // if the player is already paused, return an error
-        if (player.paused) {
-            embed   
-                .setTitle("Error")
-                .setDescription("❌ The player is already paused")
-                .setColor('Red')
-            return interaction.reply({ embeds: [embed] }, { flags: MessageFlags.Ephemeral });
-        }
 
         try {
-            await player.pause(true);
-
+            await player.queue.shuffle();
             embed
                 .setTitle("Success")
-                .setDescription("⏸️ Paused the current song")
+                .setDescription("⏸️ Shuffled the queue")
                 .setColor('Green')
+
+
+            await clearNowPlayingMessage(client, interaction.guild.id, player);
+            const eventPath = path.join(__dirname, "../events/other/playerStart.js");
+            const playerStartEvent = require(eventPath);
+            await playerStartEvent.execute(client, player, player.queue.current);
+
             return interaction.reply({ embeds: [embed] });
+
         } catch (error) {
             console.error(error);
             embed
                 .setTitle("Error")
-                .setDescription("❌ There was an error pausing the song")
+                .setDescription("❌ There was an error shuffling the queue")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed] }, { flags: MessageFlags.Ephemeral });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
-    },
-};
-
-
-
+    }
+}

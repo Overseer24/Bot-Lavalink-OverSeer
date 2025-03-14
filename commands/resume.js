@@ -1,5 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require("discord.js");
+const { clearNowPlayingMessage } = require("../utils/clearNowPlayingMessage");
+const { checkVoiceChannel } = require("../utils/voiceChannelUtils");
+const path = require("path");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +17,7 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ Nothing is playing right now")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
 
         if (!player.queue.current) {
@@ -23,7 +25,7 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ There is no song currently playing")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
 
         // const { channel } = interaction.member.voice;
@@ -36,7 +38,7 @@ module.exports = {
         //         .setTitle("Error")
         //         .setDescription("❌ You must be in the same voice channel as me to use this command!")
         //         .setColor('Red')
-        //     return interaction.reply({ embeds: [embed] , ephemeral: true});
+        //     return interaction.reply({ embeds: [embed] , flags: MessageFlags.Ephemeral});
         // }
 
         //make this a reusable function in the future 
@@ -46,26 +48,28 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ You must be in a voice channel to use this command!")
                 .setColor("Red");
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
         const botMember = await interaction.guild.members.fetchMe();
         const botVoiceChannel = botMember.voice.channel;
 
         if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
             embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
         // If the bot is disconnected but still has a queue, reconnect it
         if (!botVoiceChannel) {
             player.setVoiceChannel(memberVoiceChannel.id);
         }
 
+        // await checkVoiceChannel(interaction, player, true);
+
         if (!player.paused) {
             embed
                 .setTitle("Error")
                 .setDescription("❌ The player is already playing")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
 
         try {
@@ -74,6 +78,12 @@ module.exports = {
                 .setTitle("Success")
                 .setDescription("⏸️ Resumes the current song")
                 .setColor('Green')
+
+            await clearNowPlayingMessage(client, interaction.guild.id, player);
+            const eventPath = path.join(__dirname, "../events/other/playerStart.js");
+            const playerStartEvent = require(eventPath);
+            await playerStartEvent.execute(client, player, player.queue.current);
+
             return interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
@@ -81,7 +91,7 @@ module.exports = {
                 .setTitle("Error")
                 .setDescription("❌ There was an error resuming the song")
                 .setColor('Red')
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
     }
 

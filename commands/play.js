@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require("discord.js");
+const path = require("path");
 
 
 module.exports = {
@@ -22,12 +23,12 @@ module.exports = {
             const memberVoiceChannel = interaction.member.voice.channel;
             if (!memberVoiceChannel) {
                 embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor('Red');
-                return interaction.editReply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             }
 
             if (!memberVoiceChannel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SPEAK)) {
                 embed.setTitle("Error").setDescription("❌ I don't have permission to speak in this channel!").setColor('Red');
-                return interaction.editReply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             }
 
 
@@ -39,13 +40,19 @@ module.exports = {
                 const botVoiceChannel = botMember.voice.channel;
                 if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
                     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-                    return interaction.editReply({ embeds: [embed], ephemeral: true });
+                    return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 }
 
                 if (!botVoiceChannel) {
-                  
                     player.setVoiceChannel(memberVoiceChannel.id);
                     player.pause(false);
+
+                    // ✅ If there's a currently playing track, manually trigger "Now Playing"
+                    if (player.queue.current) {
+                        const eventPath = path.join(__dirname, "../events/other/playerStart.js");
+                        const playerStartEvent = require(eventPath);
+                        await playerStartEvent.execute(client, player, player.queue.current);
+                    }
                 }
 
             }
@@ -57,7 +64,7 @@ module.exports = {
                     guildId: interaction.guild.id,
                     voiceId: channel.id,
                     textId: interaction.channel.id,
-                    volume: 50,
+                    volume: 1,
                     deaf: true,
                 });
 
@@ -71,7 +78,7 @@ module.exports = {
                     .setTitle("Error")
                     .setDescription("❌ No results found!")
                     .setColor('Red')
-                return interaction.editReply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             }
 
             if (res.type === "PLAYLIST") {
@@ -85,7 +92,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle("Playlist added")
                     .setDescription(`🎶 Added **${res.tracks.length}** songs to the queue`)
-                    .setColor("RANDOM")
+                    .setColor('Random')
                 return interaction.editReply({ embeds: [embed] });
 
 
@@ -106,7 +113,7 @@ module.exports = {
             }
         } catch (error) {
             console.error(error);
-            return interaction.editReply({ content: "❌ There was an error while processing your request!", ephemeral: true });
+            return interaction.editReply({ content: "❌ There was an error while processing your request!", flags: MessageFlags.Ephemeral });
 
         }
 

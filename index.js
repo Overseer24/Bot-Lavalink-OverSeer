@@ -33,7 +33,7 @@ const nodes = [
 // Initialize Shoukaku
 client.manager = new Kazagumo({
     defaultSearchEngine: "youtube",
-    plugins: [new Plugins.PlayerMoved(client),],
+    plugins: [new Plugins.PlayerMoved(client)],
     send: (guildId, payload) => {
         const guild = client.guilds.cache.get(guildId);
         if (guild) guild.shard.send(payload);

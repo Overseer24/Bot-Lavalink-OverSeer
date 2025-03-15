@@ -28,30 +28,15 @@ module.exports = {
             return interaction.reply({ embeds: [embed] }, { flags: MessageFlags.Ephemeral });
         }
 
-        // const memberVoiceChannel = interaction.member.voice.channel;
-        // if (!memberVoiceChannel) {
-        //     embed
-        //         .setTitle("Error")
-        //         .setDescription("❌ You must be in a voice channel to use this command!")
-        //         .setColor("Red");
-        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-        // }
-        // const botMember = await interaction.guild.members.fetchMe();
-        // const botVoiceChannel = botMember.voice.channel;
 
-        // if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
-        //     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-        // }
-        await checkVoiceChannel(interaction, player, false);
+      
         try {
+            await checkVoiceChannel(interaction, player, false);
             await player.queue.shuffle();
-
             embed
                 .setTitle("Success")
                 .setDescription("⏸️ Shuffled the queue")
                 .setColor('Green')
-
             await clearNowPlayingMessage(client, interaction.guild.id, player);
             const eventPath = path.join(__dirname, "../events/other/playerStart.js");
             const playerStartEvent = require(eventPath);

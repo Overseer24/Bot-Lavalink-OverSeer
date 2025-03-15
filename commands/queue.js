@@ -18,23 +18,6 @@ module.exports = {
                 .setColor('Red')
             return interaction.reply({ embeds: [embed] });
         }
-        //make this a reusable function in the future
-        // const memberVoiceChannel = interaction.member.voice.channel;
-        // if (!memberVoiceChannel) {
-        //     embed
-        //         .setTitle("Error")
-        //         .setDescription("❌ You must be in a voice channel to use this command!")
-        //         .setColor("Red");
-        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-        // }
-
-        // const botVoiceChannel = client.channels.cache.get(player.voiceId);
-    
-
-        // if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
-        //     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-        //     return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-        // }
 
         try {
             const queue = player.queue;

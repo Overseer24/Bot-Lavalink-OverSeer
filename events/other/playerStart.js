@@ -29,25 +29,6 @@ module.exports = {
                 // .addField({})
                 .setColor('Random')
 
-            // const skip = new ButtonBuilder()
-            //     .setCustomId("skip")
-            //     .setLabel("Skip")
-            //     .setStyle(1)
-
-            // const pause = new ButtonBuilder()
-            //     .setCustomId("pause")
-            //     .setLabel("Pause")
-            //     .setStyle(1)
-
-            // const resume = new ButtonBuilder()
-            //     .setCustomId("resume")
-            //     .setLabel("Resume")
-            //     .setStyle(1)
-
-
-            // const row = new ActionRowBuilder()
-            //     .addComponents(skip, pause, resume);
-
             const row = buttons();
 
             if (track.thumbnail) {

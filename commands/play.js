@@ -64,7 +64,7 @@ module.exports = {
                     guildId: interaction.guild.id,
                     voiceId: channel.id,
                     textId: interaction.channel.id,
-                    volume: 1,
+                    volume: 50,
                     deaf: true,
                 });
 

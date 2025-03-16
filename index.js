@@ -25,9 +25,9 @@ client.queueMessages = new Map()
 const nodes = [
     {
         name: "Main",
-        url: `${process.env.LAVALINK_HOST}:${process.env.LAVALINK_PORT}`,
+        url: `${process.env.LAVALINK_HOST}:${process.env.LAVALINK_PORT}`, // No https:// here
         auth: process.env.LAVALINK_PASSWORD,
-        secure: process.LAVALINK_SECURE, // Set to true if using HTTPS/SSL
+        secure: process.env.LAVALINK_SECURE === "true", // Ensure boolean value
     },
 ];
 
@@ -51,7 +51,21 @@ loadCommands(client);
 loadEvents(client);
 loadButtons(client);
 
+client.manager.shoukaku.on("error", (name, error) => {
+    console.error(`🔥 Shoukaku Error on node ${name}:`, error);
+});
 
+client.manager.on("nodeError", (node, error) => {
+    console.error(`🔥 Lavalink Node Error (${node.name}):`, error);
+});
+
+client.manager.on("nodeConnect", (node) => {
+    console.log(`✅ Connected to Lavalink node: ${node.name}`);
+});
+
+client.manager.on("nodeDisconnect", (node) => {
+    console.warn(`⚠️ Disconnected from Lavalink node: ${node.name}`);
+});
 
 client.manager.on("playerStart", async (player, track) => {
 
@@ -65,41 +79,41 @@ client.manager.on("playerStart", async (player, track) => {
     }
 
 })
-.on("playerEnd", async (player) => {
-    try {
-        const eventPath = path.join(__dirname, "events", "other", "playerEnd.js");
-        const playerEndEvent = require(eventPath);
-        await playerEndEvent.execute(client, player)
-    } catch (error) {
-        console.log(error)
-    }
-})
-.on("playerEmpty", async (player) => {
-    try {
-        const eventPath = path.join(__dirname, "events", "other", "playerEmpty.js");
-        const playerEmptyEvent = require(eventPath);
-        await playerEmptyEvent.execute(client, player)
-    } catch (error) {
+    .on("playerEnd", async (player) => {
+        try {
+            const eventPath = path.join(__dirname, "events", "other", "playerEnd.js");
+            const playerEndEvent = require(eventPath);
+            await playerEndEvent.execute(client, player)
+        } catch (error) {
+            console.log(error)
+        }
+    })
+    .on("playerEmpty", async (player) => {
+        try {
+            const eventPath = path.join(__dirname, "events", "other", "playerEmpty.js");
+            const playerEmptyEvent = require(eventPath);
+            await playerEmptyEvent.execute(client, player)
+        } catch (error) {
 
-    }
-})
-.on("playerMoved", async (player, state, channels) => {
-    try {
-        const eventPath = path.join(__dirname, "events", "other", "playerMoved.js");
-        const playerMovedEvent = require(eventPath);
-        await playerMovedEvent.execute(player, state, channels, client)
-    } catch (error) {
-        console.log(error);
-    }
-}).on("playerResumed", async(player)=>{
-    try{
-        const eventPath = path.join(__dirname, "events", "other", "playerResumed.js");
-        const playerResumedEvent = require(eventPath);
-        await playerResumedEvent.execute(client, player)
-    }catch(error){
-        console.log(error)
-    }
-})
+        }
+    })
+    .on("playerMoved", async (player, state, channels) => {
+        try {
+            const eventPath = path.join(__dirname, "events", "other", "playerMoved.js");
+            const playerMovedEvent = require(eventPath);
+            await playerMovedEvent.execute(player, state, channels, client)
+        } catch (error) {
+            console.log(error);
+        }
+    }).on("playerResumed", async (player) => {
+        try {
+            const eventPath = path.join(__dirname, "events", "other", "playerResumed.js");
+            const playerResumedEvent = require(eventPath);
+            await playerResumedEvent.execute(client, player)
+        } catch (error) {
+            console.log(error)
+        }
+    })
 
 
 

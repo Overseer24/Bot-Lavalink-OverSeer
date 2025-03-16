@@ -12,22 +12,26 @@ module.exports = {
 
             } catch (error) {
                 console.error(error);
-                await interaction.reply({ content: '❌ There was an error executing this command.',  });
+                if (interaction.deferred || interaction.replied) {
+                    await interaction.editReply('❌ There was an error executing this command.');
+                } else {
+                    await interaction.reply({ content: '❌ There was an error executing this command.', ephemeral: true });
+                }
             }
-        }
-        else if (interaction.isButton()) {
+        } else if (interaction.isButton()) {
             const button = interaction.client.buttons.get(interaction.customId);
             if (!button) return;
 
             try {
                 await button.execute(interaction, interaction.client);
-
             } catch (error) {
                 console.error(error);
-                await interaction.reply({ content: '❌ There was an error executing this button.', flags: MessageFlags.Ephemeral });
+                if (interaction.deferred || interaction.replied) {
+                    await interaction.editReply('❌ There was an error executing this button.');
+                } else {
+                    await interaction.reply({ content: '❌ There was an error executing this button.', flags: MessageFlags.Ephemeral });
+                }
             }
-
-
         }
     }
 };

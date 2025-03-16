@@ -48,8 +48,10 @@ The documentation under `dev` is always for the latest commit. If something isn'
 <hr>
 
 ### Optional Dependencies
-* `pako` - Compression (gateway)
-* `zlib-sync` - Compression (gateway, faster than pako)
+All compression options are mutually exclusive.
+* `pako` - zlib Compression (gateway)
+* `zlib-sync` - zlib Compression (gateway, faster than pako)
+* `fzstd` - Zstandard Compression (gateway)
 * `erlpack` - Encoding (gateway, alternative to JSON)
 
 ## Links

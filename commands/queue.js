@@ -37,13 +37,17 @@ module.exports = {
             const tracksString = tracks.map((track, index) => {
                 return `${index + 1}. [${track.title}](${track.uri}) - ${formatDuration(track.length)}`;
             }).join("\n");
+            const totalPages = Math.ceil(queue.length / 10);
 
             embed
                 .setTitle("Queue")
                 .setDescription(`**Now Playing:** [${current.title}](${current.uri}) - \`${formatDuration(current.length)}\`\n\n${queue.length > 0 ? "**Up Next:**\n" + tracksString : "Add more songs to the queue!"}`)
                 .setColor('Random')
                 .setThumbnail(current.thumbnail)
-                .setFooter({ text: `Page 1 of ${Math.ceil(queue.length / 10)}` });
+            // .setFooter({ text: `Page 1 of ${Math.ceil(queue.length / 10)}` });
+            if (totalPages > 0) {
+                embed.setFooter({ text: `Page 1 of ${totalPages}` });
+            }
             const guildQueueMessage = client.queueMessages.get(interaction.guild.id);
             if (guildQueueMessage) {
                 try {

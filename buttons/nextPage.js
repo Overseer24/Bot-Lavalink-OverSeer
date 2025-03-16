@@ -14,7 +14,7 @@ module.exports = {
         const [currentPage, totalPages] = page;
         if (currentPage >= totalPages) return interaction.deferUpdate();
         const queue = player.queue;
-        const startIndex = currentPage * 10;
+        const startIndex = (currentPage-1) * 10;
         const tracks = queue.slice(startIndex, startIndex + 10);
         const tracksString = tracks.map((track, index) => `${startIndex + index + 1}. [${track.title}](${track.uri}) - ${formatDuration(track.length)}`).join("\n");
 

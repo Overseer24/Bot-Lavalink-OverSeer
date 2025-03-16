@@ -20,6 +20,7 @@ const client = new Client({
 client.commands = new Map();
 client.buttons = new Map();
 client.nowPlayingMessages = new Map()
+client.queueMessages = new Map()
 // Lavalink Node Configuration for Shoukaku
 const nodes = [
     {

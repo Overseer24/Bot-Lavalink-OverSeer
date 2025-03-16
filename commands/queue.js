@@ -1,7 +1,7 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { data } = require("./skip");
 const { formatDuration } = require("../utils/durationFormatter.js");
-
+const { queueButtons } = require("../utils/queueButtonsComponent.js")
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,6 +18,8 @@ module.exports = {
                 .setColor('Red')
             return interaction.reply({ embeds: [embed] });
         }
+
+
 
         try {
             const queue = player.queue;
@@ -41,7 +43,22 @@ module.exports = {
                 .setDescription(`**Now Playing:** [${current.title}](${current.uri}) - \`${formatDuration(current.length)}\`\n\n${queue.length > 0 ? "**Up Next:**\n" + tracksString : "Add more songs to the queue!"}`)
                 .setColor('Random')
                 .setThumbnail(current.thumbnail)
-            return interaction.reply({ embeds: [embed] });
+                .setFooter({ text: `Page 1 of ${Math.ceil(queue.length / 10)}` });
+            const guildQueueMessage = client.queueMessages.get(interaction.guild.id);
+            if (guildQueueMessage) {
+                try {
+                    const oldMessage = await interaction.channel.messages.fetch(guildQueueMessage);
+                    if (oldMessage) await oldMessage.delete();
+                } catch (error) {
+                    console.error("Failed to delete old queue message:", error);
+                }
+            }
+
+            await interaction.reply({ embeds: [embed], components: [queueButtons(1, Math.ceil(queue.length / 10))] });
+            const queueMessage = await interaction.fetchReply(); // ✅ Fetch the sent message
+
+            client.queueMessages.set(interaction.guild.id, queueMessage.id);
+
         } catch (error) {
             console.error(error);
             embed

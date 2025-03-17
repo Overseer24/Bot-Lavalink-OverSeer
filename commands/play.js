@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
 const path = require("path");
+const { updateQueueMessage } = require("../utils/updateQueueMessage");
 
 module.exports = {
     data: new SlashCommandBuilder()

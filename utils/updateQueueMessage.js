@@ -28,8 +28,11 @@ async function updateQueueMessage(client, guildId, player) {
             .setDescription(`**Now Playing:** [${queue.current.title}](${queue.current.uri}) - \`${formatDuration(queue.current.length)}\`\n\n${tracksString || "No more songs!"}`)
             .setColor("Blue")
             .setThumbnail(player.queue.current.thumbnail)
-            .setFooter({ text: `Page ${currentPage} of ${totalPages}` });
 
+        //if queue less than 10
+        if (queue.length <= 10) {
+            embed.setFooter({ text: `Page 1 of 1` });
+        }
         // Edit the existing queue message
         await message.edit({ embeds: [embed], components: [queueButtons(currentPage, totalPages)] });
 

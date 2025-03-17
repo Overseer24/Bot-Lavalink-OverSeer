@@ -43,7 +43,13 @@ module.exports = {
                 .setDescription(`**Now Playing:** [${current.title}](${current.uri}) - \`${formatDuration(current.length)}\`\n\n${queue.length > 0 ? "**Up Next:**\n" + tracksString : "Add more songs to the queue!"}`)
                 .setColor('Random')
                 .setThumbnail(current.thumbnail)
-                .setFooter({ text: `Page 1 of ${Math.ceil(queue.length / 10)}` });
+
+            //if queue less than 10
+            if (queue.length <= 10) {
+                embed.setFooter({ text: `Page 1 of 1` });
+            }
+            embed.setFooter({ text: `Page 1 of ${Math.ceil(queue.length / 10)}` });
+
             const guildQueueMessage = client.queueMessages.get(interaction.guild.id);
             if (guildQueueMessage) {
                 try {

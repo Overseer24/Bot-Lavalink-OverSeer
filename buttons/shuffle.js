@@ -2,6 +2,7 @@ const { EmbedBuilder, MessageFlags } = require("discord.js");
 const {clearNowPlayingMessage} = require("../utils/clearNowPlayingMessage");
 const {checkVoiceChannel} = require("../utils/voiceChannelUtils");
 const path = require("path");
+const { updateQueueMessage } = require("../utils/updateQueueMessage");
 module.exports = {
     customId: "shuffle",
     async execute(interaction, client) {
@@ -33,6 +34,7 @@ module.exports = {
         try {
             await checkVoiceChannel(interaction, player, false);
             await player.queue.shuffle();
+            await updateQueueMessage(client, interaction.guild.id, player);
             embed
                 .setTitle("Success")
                 .setDescription("⏸️ Shuffled the queue")

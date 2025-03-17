@@ -1,5 +1,5 @@
 const { EmbedBuilder, MessageFlags} = require("discord.js");
-
+const { updateQueueMessage } = require("../utils/updateQueueMessage");
 
 module.exports = {
     customId: "skip",
@@ -58,7 +58,7 @@ module.exports = {
 
         try {
             await player.skip();
-
+            await updateQueueMessage(client, interaction.guild.id, player);
             embed
                 .setTitle("Success")
                 .setDescription("⏭️ Skipped the current song")

@@ -18,7 +18,7 @@ module.exports = {
         const startIndex = (currentPage - 2) * 10;
         const tracks = queue.slice(startIndex, startIndex + 10);
         const tracksString = tracks.map((track, index) => `${startIndex + index + 1}. [${track.title}](${track.uri}) - ${formatDuration(track.length)}`).join("\n");
-        
+        console.log("Next Start Index: ",startIndex);
         
         const embed = new EmbedBuilder()
             .setTitle("Queue")

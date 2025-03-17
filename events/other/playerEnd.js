@@ -20,6 +20,7 @@ module.exports = {
             //         console.error("Failed to delete Now Playing message:", error);
             //     }
             // }
+            // await updateQueueMessage(client, player.guildId, player);
             await clearNowPlayingMessage(client, player.guildId, player);
         } catch (e) {
             console.log("Could not delete the now playing message")

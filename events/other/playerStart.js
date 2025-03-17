@@ -2,7 +2,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require("discord.js");
 const path = require("path");
 const { formatDuration } = require("../../utils/durationFormatter.js");
 const { buttons } = require("../../utils/buttonsComponents.js")
-
+const { updateQueueMessage } = require("../../utils/updateQueueMessage");
 
 module.exports = {
     name: 'playerStart',
@@ -38,7 +38,7 @@ module.exports = {
                 embed.setThumbnail(client.user.displayAvatarURL());
             }
 
-
+            await updateQueueMessage(client, player.guildId, player);
             // Send the embed message and store it in a variable to track it
             const nowPlayingMessageNew = await textChannel.send({
                 embeds: [embed],

@@ -2,6 +2,7 @@ const { EmbedBuilder, SlashCommandBuilder, MessageFlags } = require("discord.js"
 const path = require("path");
 const { clearNowPlayingMessage } = require("../utils/clearNowPlayingMessage");
 const { checkVoiceChannel } = require("../utils/voiceChannelUtils");
+const { updateQueueMessage } = require("../utils/updateQueueMessage");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -50,7 +51,7 @@ module.exports = {
                 .setDescription("⏸️ Shuffled the queue")
                 .setColor('Green')
 
-
+            await updateQueueMessage(client, interaction.guild.id, player);
             await clearNowPlayingMessage(client, interaction.guild.id, player);
             const eventPath = path.join(__dirname, "../events/other/playerStart.js");
             const playerStartEvent = require(eventPath);

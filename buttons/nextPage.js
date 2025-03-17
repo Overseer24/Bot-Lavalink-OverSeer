@@ -11,10 +11,12 @@ module.exports = {
 
 
         const page = (interaction.message.embeds[0]?.footer?.text?.match(/\d+/g) || [1, 1]).map(Number);
+        console.log(page);
         const [currentPage, totalPages] = page;
         if (currentPage >= totalPages) return interaction.deferUpdate();
         const queue = player.queue;
-        const startIndex = (currentPage-1) * 10;
+        const startIndex = (currentPage) * 10; // 0, 10, 20, 30, 40, 50, 60, 70, 80, 90
+        console.log("Next Start Index: ",startIndex , "to", startIndex + 10);
         const tracks = queue.slice(startIndex, startIndex + 10);
         const tracksString = tracks.map((track, index) => `${startIndex + index + 1}. [${track.title}](${track.uri}) - ${formatDuration(track.length)}`).join("\n");
 
@@ -38,6 +40,7 @@ module.exports = {
                 const message = await textChannel.messages.fetch(guildQueueMessage);
           
                 if (message) await message.delete();
+                client.queueMessages.delete(interaction.guild.id);
             } catch (error) {
                 console.error("Failed to delete old queue message:", error);
             }

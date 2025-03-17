@@ -1,6 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
 const path = require("path");
-
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,51 +12,45 @@ module.exports = {
         ),
 
     async execute(interaction, client) {
-
         try {
             await interaction.deferReply();
             const embed = new EmbedBuilder();
-
             const query = interaction.options.getString("query");
             const { channel } = interaction.member.voice;
             const memberVoiceChannel = interaction.member.voice.channel;
+
             if (!memberVoiceChannel) {
-                embed.setTitle("Error").setDescription("❌ You must be in a voice channel to use this command!").setColor('Red');
-                return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                embed.setTitle("Error").setDescription("❌ You must be in a voice channel!").setColor('Red');
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             if (!memberVoiceChannel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SPEAK)) {
-                embed.setTitle("Error").setDescription("❌ I don't have permission to speak in this channel!").setColor('Red');
-                return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                embed.setTitle("Error").setDescription("❌ I don't have permission to speak!").setColor('Red');
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
-
-
 
             let player = client.manager.players.get(interaction.guild.id);
 
             if (player) {
                 const botMember = await interaction.guild.members.fetchMe();
                 const botVoiceChannel = botMember.voice.channel;
+
                 if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
                     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-                    return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                    return interaction.reply({ embeds: [embed], ephemeral: true });
                 }
 
                 if (!botVoiceChannel) {
                     player.setVoiceChannel(memberVoiceChannel.id);
                     player.pause(false);
 
-                    // ✅ If there's a currently playing track, manually trigger "Now Playing"
                     if (player.queue.current) {
                         const eventPath = path.join(__dirname, "../events/other/playerStart.js");
                         const playerStartEvent = require(eventPath);
                         await playerStartEvent.execute(client, player, player.queue.current);
                     }
                 }
-
             }
-
-
 
             if (!player) {
                 player = await client.manager.createPlayer({
@@ -65,57 +58,51 @@ module.exports = {
                     voiceId: channel.id,
                     textId: interaction.channel.id,
                     volume: 50,
-                    deaf: true,
+                    deaf: false, // Try setting this to false if issues persist
                 });
-
-                // Force connect the bot to the VC
-
             }
 
             const res = await player.search(query, { requester: interaction.user });
             if (!res.tracks.length) {
-                embed
-                    .setTitle("Error")
-                    .setDescription("❌ No results found!")
-                    .setColor('Red')
-                return interaction.editReply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                embed.setTitle("Error").setDescription("❌ No results found!").setColor('Red');
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             if (res.type === "PLAYLIST") {
                 for (let track of res.tracks) {
                     player.queue.add(track);
                 }
+
                 if (!player.playing && !player.paused) {
-                    player.play();
+                    setTimeout(() => {
+                        if (!player.playing) player.play();
+                    }, 1000);
                 }
 
-                const embed = new EmbedBuilder()
-                    .setTitle("Playlist added")
+
+                embed.setTitle("Playlist added")
                     .setDescription(`🎶 Added **${res.tracks.length}** songs to the queue`)
-                    .setColor('Random')
+                    .setColor('Random');
+                await updateQueueMessage(client, interaction.guild.id, player);
                 return interaction.editReply({ embeds: [embed] });
 
-
-            }
-            else {
+            } else {
                 player.queue.add(res.tracks[0]);
                 if (!player.playing && !player.paused) {
-                    player.play();
-                    // console.log(player.queue.current)
+                    setTimeout(() => {
+                        if (!player.playing) player.play();
+                    }, 1000);
                 }
-
-                embed
-                    .setTitle("Song added")
+                await updateQueueMessage(client, interaction.guild.id, player);
+                embed.setTitle("Song added")
                     .setDescription(`🎶 Added **${res.tracks[0].title}** to the queue`)
-                    .setColor("Red")
+                    .setColor("Red");
 
                 return interaction.editReply({ embeds: [embed] });
             }
         } catch (error) {
             console.error(error);
-            return interaction.editReply({ content: "❌ There was an error while processing your request!", flags: MessageFlags.Ephemeral });
-
+            return interaction.reply({ content: "❌ An error occurred!", ephemeral: true });
         }
-
     }
 };

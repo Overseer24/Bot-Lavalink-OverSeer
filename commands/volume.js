@@ -39,6 +39,14 @@ module.exports = {
         try {
             // await interaction.deferReply();
             await checkVoiceChannel(interaction, player, false);
+
+            if (!player.volume == volume) {
+                embed
+                    .setTitle("Error")
+                    .setDescription("❌ The volume is already set to that value")
+                    .setColor('Red')
+                return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+            }
             await player.setVolume(volume);
             await clearNowPlayingMessage(client, interaction.guild.id, player);
             const eventPath = path.join(__dirname, "../events/other/playerStart.js");
@@ -49,7 +57,7 @@ module.exports = {
                 .setDescription(`🔊 Set the volume to ${volume}`)
                 .setColor('Green')
             const row = buttons();
-            return interaction.reply({ embeds: [embed]});
+            return interaction.reply({ embeds: [embed] });
         } catch (error) {
             console.error(error);
             embed

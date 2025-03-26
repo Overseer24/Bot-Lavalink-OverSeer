@@ -1,5 +1,6 @@
 const { EmbedBuilder, SlashCommandBuilder, MessageFlags } = require("discord.js");
 const { checkVoiceChannel } = require("../utils/voiceChannelUtils");
+const { updateQueueMessage } = require("../utils/updateQueueMessage");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("remove-queue")
@@ -54,6 +55,8 @@ module.exports = {
             .setTitle("Success")
             .setDescription(`✅ Removed [${removed[0].title}](${removed[0].uri}) from the queue`)
             .setColor('Green')
+            
+        await updateQueueMessage(client, interaction.guild.id, player);
         return interaction.reply({ embeds: [embed] });
     }
 

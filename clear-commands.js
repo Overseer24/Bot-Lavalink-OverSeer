@@ -22,7 +22,7 @@ const rest = new REST({ version: '10' }).setToken(botToken);
         console.log('Started refreshing application (/) commands.');
 
         await rest.put(
-            Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
+            Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DESQ_SERVER_ID),
             { body: [] },
         );
 
@@ -31,4 +31,3 @@ const rest = new REST({ version: '10' }).setToken(botToken);
         console.error('Failed to reload application (/) commands:', error);
     }
 })();
-

@@ -1,12 +1,12 @@
-const { MessageFlags } = require("discord.js");
+const { Events, MessageFlags } = require("discord.js");
 
 module.exports = {
-    name: 'interactionCreate',
+    name: Events.InteractionCreate,
     async execute(interaction) {
         if (interaction.isChatInputCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
             if (!command) return;
-
+            
             try {
                 await command.execute(interaction, interaction.client);
 
@@ -15,7 +15,7 @@ module.exports = {
                 if (interaction.deferred || interaction.replied) {
                     await interaction.editReply('❌ There was an error executing this command.');
                 } else {
-                    await interaction.reply({ content: '❌ There was an error executing this command.', ephemeral: true });
+                    await interaction.reply({ content: '❌ There was an error executing this command.', flags: MessageFlags.Ephemeral });
                 }
             }
         } else if (interaction.isButton()) {

@@ -42,11 +42,6 @@ client.manager = new Kazagumo({
 }, new Connectors.DiscordJS(client), nodes);
 
 
-// Bot ready event
-client.once("ready", async () => {
-    console.log(`✅ Logged in as ${client.user.tag}`);
-});
-
 loadCommands(client);
 loadEvents(client);
 loadButtons(client);
@@ -68,7 +63,6 @@ client.manager.on("nodeDisconnect", (node) => {
 });
 
 client.manager.on("playerStart", async (player, track) => {
-
     try {
         const eventPath = path.join(__dirname, "events", "other", "playerStart.js");
         const playerStartEvent = require(eventPath)
@@ -77,7 +71,6 @@ client.manager.on("playerStart", async (player, track) => {
     } catch (error) {
         console.error(error);
     }
-
 })
     .on("playerEnd", async (player) => {
         try {
@@ -114,8 +107,5 @@ client.manager.on("playerStart", async (player, track) => {
             console.log(error)
         }
     })
-
-
-
 // Login bot
 client.login(process.env.DISCORD_TOKEN).catch(console.error);

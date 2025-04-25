@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require("discord.js");
 const path = require("path");
 const { updateQueueMessage } = require("../utils/updateQueueMessage");
 
@@ -13,21 +13,21 @@ module.exports = {
         ),
 
     async execute(interaction, client) {
+        const embed = new EmbedBuilder();
+        const query = interaction.options.getString("query");
+        const { channel } = interaction.member.voice;
+        const memberVoiceChannel = interaction.member.voice.channel;
+
         try {
             await interaction.deferReply();
-            const embed = new EmbedBuilder();
-            const query = interaction.options.getString("query");
-            const { channel } = interaction.member.voice;
-            const memberVoiceChannel = interaction.member.voice.channel;
-
             if (!memberVoiceChannel) {
                 embed.setTitle("Error").setDescription("❌ You must be in a voice channel!").setColor('Red');
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
 
             if (!memberVoiceChannel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.SPEAK)) {
                 embed.setTitle("Error").setDescription("❌ I don't have permission to speak!").setColor('Red');
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
 
             let player = client.manager.players.get(interaction.guild.id);
@@ -38,7 +38,7 @@ module.exports = {
 
                 if (botVoiceChannel && botVoiceChannel.id !== memberVoiceChannel.id) {
                     embed.setTitle("Error").setDescription("❌ You must be in the same voice channel as me!").setColor("Red");
-                    return interaction.reply({ embeds: [embed], ephemeral: true });
+                    return interaction.editReply({ embeds: [embed], ephemeral: true });
                 }
 
                 if (!botVoiceChannel) {
@@ -59,14 +59,14 @@ module.exports = {
                     voiceId: channel.id,
                     textId: interaction.channel.id,
                     volume: 50,
-                    deaf: false, // Try setting this to false if issues persist
+                    deaf: false,
                 });
             }
 
             const res = await player.search(query, { requester: interaction.user });
             if (!res.tracks.length) {
                 embed.setTitle("Error").setDescription("❌ No results found!").setColor('Red');
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
 
             if (res.type === "PLAYLIST") {
@@ -80,30 +80,33 @@ module.exports = {
                     }, 1000);
                 }
 
-
                 embed.setTitle("Playlist added")
                     .setDescription(`🎶 Added **${res.tracks.length}** songs to the queue`)
                     .setColor('Random');
+                await interaction.editReply({ embeds: [embed] });
                 await updateQueueMessage(client, interaction.guild.id, player);
-                return interaction.editReply({ embeds: [embed] });
+                return;
 
             } else {
                 player.queue.add(res.tracks[0]);
+
                 if (!player.playing && !player.paused) {
                     setTimeout(() => {
                         if (!player.playing) player.play();
                     }, 1000);
                 }
+                await interaction.editReply({ embeds: [embed] });
                 await updateQueueMessage(client, interaction.guild.id, player);
                 embed.setTitle("Song added")
                     .setDescription(`🎶 Added **${res.tracks[0].title}** to the queue`)
                     .setColor("Red");
 
-                return interaction.editReply({ embeds: [embed] });
+                return;
             }
         } catch (error) {
             console.error(error);
-            return interaction.reply({ content: "❌ An error occurred!", ephemeral: true });
+            embed.setTitle("Error").setDescription("❌ An error occurred while executing the command.").setColor('Red');
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
     }
 };
